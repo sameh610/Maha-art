@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المجموعات</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <img src="مها.jpg" alt="Logo" class="logo">
+        <h1>إدارة المجموعات</h1>
+        <nav>
+            <a href="index.html">الصفحة الرئيسية</a>
+            <a href="groups.html">إدارة المجموعات</a>
+            <a href="kids.html">إدارة الأطفال</a>
+            <a href="attendance.html">تتبع الحضور</a>
+            <a href="parent-view.html">عرض للآباء</a>
+        </nav>
+    </header>
+    <main>
+        <h2>إضافة مجموعة جديدة</h2>
+        <form id="group-form">
+            <label for="group-day">اليوم:</label>
+            <input type="text" id="group-day" name="group-day" required>
+            <label for="group-time">الوقت:</label>
+            <input type="text" id="group-time" name="group-time" required>
+            <button type="submit">إضافة المجموعة</button>
+        </form>
+        <h2>المجموعات</h2>
+        <ul id="group-list"></ul>
+    </main>
+    <footer>
+        <p>&copy; 2024 مع مها</p>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>

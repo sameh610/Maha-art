@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تتبع الحضور</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <img src="مها.jpg" alt="Logo" class="logo">
+        <h1>تتبع الحضور</h1>
+        <nav>
+            <a href="index.html">الصفحة الرئيسية</a>
+            <a href="groups.html">إدارة المجموعات</a>
+            <a href="kids.html">إدارة الأطفال</a>
+            <a href="attendance.html">تتبع الحضور</a>
+            <a href="parent-view.html">عرض للآباء</a>
+        </nav>
+    </header>
+    <main>
+        <h2>تحديد الحضور</h2>
+        <form id="attendance-form">
+            <label for="attendance-group">المجموعة:</label>
+            <select id="attendance-group" name="attendance-group" required></select>
+            <button type="submit">عرض الأطفال</button>
+        </form>
+        <div id="attendance-list-container" style="display:none;">
+            <h2>الأطفال في المجموعة</h2>
+            <form id="attendance-list-form">
+                <ul id="attendance-list"></ul>
+                <button type="submit">تحديث الحضور</button>
+            </form>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 مع مها</p>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>
