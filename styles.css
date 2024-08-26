@@ -1,15 +1,16 @@
+/* Base styles for body and typography */
 body {
     font-family: 'Arial', sans-serif;
     direction: rtl;
     margin: 0;
     padding: 0;
-    background-color: #f0f0f0;
+    background-color: #f0f0f0; /* Light gray background for a neutral look */
 }
 
 header {
-    background-color: #4CAF50;
+    background-color: #333; /* Changed from green to dark gray for a more neutral look */
     color: white;
-    padding: 10px 0;
+    padding: 20px 0;
     text-align: center;
     position: relative;
 }
@@ -21,22 +22,109 @@ header {
     right: 10px;
 }
 
+h1 {
+    margin: 0;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    background: #444; /* Slightly lighter gray than the header for subtle contrast */
+    padding: 10px 0;
+}
+
 nav a {
-    margin: 0 15px;
     color: white;
+    padding: 10px 20px;
+    margin: 0 15px;
     text-decoration: none;
+    text-transform: uppercase;
+}
+
+nav a:hover {
+    background: #555; /* Lighter gray for hover effect */
 }
 
 main {
     padding: 20px;
+    background: white;
+    margin: 20px;
+    border-radius: 8px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+li:last-child {
+    border-bottom: none;
+}
+
+button {
+    background: #007BFF; /* Bootstrap's primary blue for a vibrant contrast */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
 }
 
 footer {
-    background-color: #4CAF50;
+    background-color: #333; /* Consistent with header background */
     color: white;
     text-align: center;
     padding: 10px 0;
     position: fixed;
     width: 100%;
     bottom: 0;
+}
+
+/* Styles for forms */
+form {
+    background: #f2f2f2;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+input[type="text"], input[type="submit"] {
+    padding: 10px;
+    margin: 8px 0;
+    display: block;
+    width: 100%;
+}
+
+input[type="submit"] {
+    background: #0069d9;
+    color: white;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background: #0056b3;
+}
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+    }
+
+    header, nav a {
+        padding: 10px;
+    }
+
+    main {
+        margin: 5px;
+    }
 }

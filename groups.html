@@ -18,13 +18,19 @@
             <a href="parent-view.html">عرض للآباء</a>
         </nav>
     </header>
+    
     <main>
         <h2>إضافة مجموعة جديدة</h2>
         <form id="group-form">
+            <label for="group-name">اسم المجموعة:</label>
+            <input type="text" id="group-name" name="group-name" required>
+            
             <label for="group-day">اليوم:</label>
             <input type="text" id="group-day" name="group-day" required>
+            
             <label for="group-time">الوقت:</label>
             <input type="text" id="group-time" name="group-time" required>
+            
             <button type="submit">إضافة المجموعة</button>
         </form>
         <h2>المجموعات</h2>
