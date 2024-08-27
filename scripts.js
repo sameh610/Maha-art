@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Base URL for the backend
+    const BASE_URL = 'https://https-mamha-onrender-com.onrender.com/api';
+
     // Element references
     const groupForm = document.getElementById('group-form');
     const groupList = document.getElementById('group-list');
@@ -12,45 +15,103 @@ document.addEventListener('DOMContentLoaded', () => {
     const parentViewList = document.getElementById('parent-view-list');
     const parentViewContainer = document.getElementById('parent-view-container');
 
-    // Data storage
-    const groups = JSON.parse(localStorage.getItem('groups')) || [];
-    const kids = JSON.parse(localStorage.getItem('kids')) || [];
+    // Fetch and render groups
+    async function fetchGroups() {
+        try {
+            const response = await fetch(`${BASE_URL}/groups`);
+            const groups = await response.json();
+            renderGroups(groups);
+        } catch (error) {
+            console.error('Error fetching groups:', error);
+        }
+    }
 
     // Render group lists and dropdowns
-    function renderGroups() {
+    function renderGroups(groups) {
         if (groupList) {
             groupList.innerHTML = '';
             groups.forEach(group => {
                 const li = document.createElement('li');
                 li.textContent = `${group.name}: ${group.day} - ${group.time}`;
+
+                // Add delete button for each group
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'حذف';
+                deleteButton.onclick = async () => {
+                    try {
+                        const response = await fetch(`${BASE_URL}/groups/${group._id}`, {
+                            method: 'DELETE'
+                        });
+                        if (response.ok) {
+                            fetchGroups();  // Refresh groups
+                        } else {
+                            alert('Failed to delete group');
+                        }
+                    } catch (error) {
+                        console.error('Error deleting group:', error);
+                    }
+                };
+
+                li.appendChild(deleteButton);
                 groupList.appendChild(li);
             });
         }
         if (attendanceGroupSelect) {
             attendanceGroupSelect.innerHTML = '';
-            groups.forEach((group, index) => {
+            groups.forEach(group => {
                 const option = document.createElement('option');
-                option.value = index;
+                option.value = group._id;
                 option.textContent = `${group.name}: ${group.day} - ${group.time}`;
                 attendanceGroupSelect.appendChild(option);
             });
         }
     }
 
+    // Fetch and render kids
+    async function fetchKids() {
+        try {
+            const response = await fetch(`${BASE_URL}/kids`);
+            const kids = await response.json();
+            renderKids(kids);
+        } catch (error) {
+            console.error('Error fetching kids:', error);
+        }
+    }
+
     // Render kid list
-    function renderKids() {
+    function renderKids(kids) {
         if (kidList) {
             kidList.innerHTML = '';
             kids.forEach(kid => {
                 const li = document.createElement('li');
-                li.textContent = `${kid.name} - العائلة: ${kid.mother}, مجموعة: ${kid.group}`;
+                li.textContent = `${kid.name} - العائلة: ${kid.mother}, مجموعة: ${kid.group.name}`;
+
+                // Add delete button for each kid
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'حذف';
+                deleteButton.onclick = async () => {
+                    try {
+                        const response = await fetch(`${BASE_URL}/kids/${kid._id}`, {
+                            method: 'DELETE'
+                        });
+                        if (response.ok) {
+                            fetchKids();  // Refresh kids
+                        } else {
+                            alert('Failed to delete kid');
+                        }
+                    } catch (error) {
+                        console.error('Error deleting kid:', error);
+                    }
+                };
+
+                li.appendChild(deleteButton);
                 kidList.appendChild(li);
             });
         }
     }
 
     // Render parent view
-    function renderParentView() {
+    function renderParentView(kids) {
         if (parentViewList) {
             parentViewList.innerHTML = '';
             kids.forEach(kid => {
@@ -62,41 +123,67 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Event handling for form submissions
-    groupForm?.addEventListener('submit', (e) => {
+    // Add group
+    groupForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = e.target['group-name'].value;
         const day = e.target['group-day'].value;
         const time = e.target['group-time'].value;
-        if (!groups.some(group => group.name === name)) {
-            groups.push({ name, day, time });
-            localStorage.setItem('groups', JSON.stringify(groups));
-            renderGroups();
-            groupForm.reset();
-        } else {
-            alert('اسم المجموعة موجود بالفعل. يرجى اختيار اسم آخر.');
+
+        try {
+            const response = await fetch(`${BASE_URL}/groups`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, day, time })
+            });
+
+            if (response.ok) {
+                fetchGroups();  // Refresh groups
+                groupForm.reset();
+            } else {
+                alert('Failed to add group');
+            }
+        } catch (error) {
+            console.error('Error adding group:', error);
         }
     });
 
-    kidForm?.addEventListener('submit', (e) => {
+    // Add kid
+    kidForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = e.target['kid-name'].value;
         const mother = e.target['mother-name'].value;
-        const groupName = e.target['group-name'].value;
-        if (groups.some(group => group.name === groupName)) {
-            kids.push({ name, mother, group: groupName });
-            localStorage.setItem('kids', JSON.stringify(kids));
-            renderKids();
-            kidForm.reset();
-        } else {
-            alert('المجموعة المحددة غير موجودة');
+        const groupId = e.target['group-name'].value;
+
+        try {
+            const response = await fetch(`${BASE_URL}/kids`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, mother, group: groupId })
+            });
+
+            if (response.ok) {
+                fetchKids();  // Refresh kids
+                kidForm.reset();
+            } else {
+                alert('Failed to add kid');
+            }
+        } catch (error) {
+            console.error('Error adding kid:', error);
         }
     });
 
-    attendanceForm?.addEventListener('submit', (e) => {
+    // Handle attendance submission
+    attendanceForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const groupIndex = attendanceGroupSelect.value;
-        const groupKids = kids.filter(kid => kid.group === groups[groupIndex]?.name);
+        const groupId = attendanceGroupSelect.value;
+        const response = await fetch(`${BASE_URL}/kids`);
+        const kids = await response.json();
+        const groupKids = kids.filter(kid => kid.group._id === groupId);
         attendanceListContainer.style.display = 'block';
         attendanceList.innerHTML = '';
         groupKids.forEach(kid => {
@@ -104,9 +191,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const nameText = `${kid.name} - `;
             const attendedButton = document.createElement('button');
             attendedButton.textContent = 'حضر لقاء';
-            attendedButton.onclick = () => {
-                kid.attendanceCount = (kid.attendanceCount || 0) + 1;
-                localStorage.setItem('kids', JSON.stringify(kids));
+            attendedButton.onclick = async () => {
+                try {
+                    const response = await fetch(`${BASE_URL}/kids/${kid._id}/attendance`, {
+                        method: 'PUT'
+                    });
+
+                    if (response.ok) {
+                        fetchKids();  // Refresh kids to update attendance count
+                    } else {
+                        alert('Failed to update attendance');
+                    }
+                } catch (error) {
+                    console.error('Error updating attendance:', error);
+                }
             };
 
             const countDisplay = document.createElement('span');
@@ -118,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (kid.attendanceCount >= 4) {
                     kid.attendanceCount -= 4;
                     countDisplay.textContent = ` الحضور: ${kid.attendanceCount} `;
-                    localStorage.setItem('kids', JSON.stringify(kids));
+                    // Ideally, update the backend here as well
                 }
             };
 
@@ -127,12 +225,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Handle parent view form submission
     parentViewForm?.addEventListener('submit', (e) => {
         e.preventDefault();
-        renderParentView();
+        fetchKids().then(renderParentView); // Render parent view with fetched kids data
     });
 
-    // Initial render calls
-    renderGroups();
-    renderKids();
+    // Initial fetch and render
+    fetchGroups();
+    fetchKids();
 });
