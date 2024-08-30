@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const correctCode = "1234"; // Your access code
+    const correctCode = "XY675"; // Your access code
     const userCode = prompt("Enter access code:");
 
     if (userCode === correctCode) {
