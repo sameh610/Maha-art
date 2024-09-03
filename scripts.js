@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const correctCode = "XY675"; // Your access code
+    const correctCode = "XY675";
     const accessCodeForm = document.getElementById('access-code-form');
     let accessGranted = false;
 
-    // Handle the form submission for access code
     accessCodeForm?.addEventListener('submit', (e) => {
         e.preventDefault();
         const userCode = e.target['access-code'].value;
@@ -17,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Prevent navigation to protected pages if access isn't granted
     function checkAccess(event) {
         if (!accessGranted) {
             event.preventDefault();
@@ -25,16 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Add event listeners to protected navigation links
     const protectedLinks = document.querySelectorAll('a.protected');
     protectedLinks.forEach(link => {
         link.addEventListener('click', checkAccess);
     });
 
-    // Base URL for the backend
     const BASE_URL = 'https://https-mamha-onrender-com.onrender.com/api';
-
-    // Element references
     const groupForm = document.getElementById('group-form');
     const groupList = document.getElementById('group-list');
     const kidForm = document.getElementById('kid-form');
@@ -47,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const parentViewList = document.getElementById('parent-view-list');
     const parentViewContainer = document.getElementById('parent-view-container');
 
-    // Fetch and render groups
     async function fetchGroups() {
         try {
             const response = await fetch(`${BASE_URL}/groups`);
@@ -58,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Render group lists and dropdowns
     function renderGroups(groups) {
         if (groupList) {
             groupList.innerHTML = '';
@@ -66,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const li = document.createElement('li');
                 li.textContent = `${group.name}: ${group.day} - ${group.time}`;
 
-                // Add delete button for each group
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'حذف';
                 deleteButton.addEventListener('click', async () => {
@@ -75,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             method: 'DELETE'
                         });
                         if (response.ok) {
-                            fetchGroups();  // Refresh groups
+                            fetchGroups();
                         } else {
                             alert('Failed to delete group');
                         }
@@ -99,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Fetch and render kids
     async function fetchKids() {
         try {
             const response = await fetch(`${BASE_URL}/kids`);
@@ -110,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Render kid list
     function renderKids(kids) {
         if (kidList) {
             kidList.innerHTML = '';
@@ -118,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const li = document.createElement('li');
                 li.textContent = `${kid.name} - العائلة: ${kid.mother}, مجموعة: ${kid.group.name}`;
 
-                // Add delete button for each kid
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'حذف';
                 deleteButton.addEventListener('click', async () => {
@@ -127,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             method: 'DELETE'
                         });
                         if (response.ok) {
-                            fetchKids();  // Refresh kids
+                            fetchKids();
                         } else {
                             alert('Failed to delete kid');
                         }
@@ -142,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Render parent view
     function renderParentView(kids) {
         if (parentViewList) {
             parentViewList.innerHTML = '';
@@ -155,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Add group
     groupForm?.addEventListener('submit', (e) => {
         e.preventDefault();
         const name = e.target['group-name'].value;
@@ -171,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => {
             if (response.ok) {
-                fetchGroups();  // Refresh groups
+                fetchGroups();
                 groupForm.reset();
             } else {
                 alert('Failed to add group');
@@ -180,32 +166,52 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => console.error('Error adding group:', error));
     });
 
-    // Add kid
-    kidForm?.addEventListener('submit', (e) => {
+    kidForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = e.target['kid-name'].value;
         const mother = e.target['mother-name'].value;
-        const groupId = e.target['group-name'].value;
-
-        fetch(`${BASE_URL}/kids`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name, mother, group: groupId })
-        })
-        .then(response => {
-            if (response.ok) {
+        const groupName = e.target['group-name'].value;
+    
+        try {
+            // Fetch the group by name
+            const groupResponse = await fetch(`${BASE_URL}/groups?name=${encodeURIComponent(groupName)}`);
+            const groups = await groupResponse.json();
+    
+            // Check if the group was found
+            if (groups.length === 0) {
+                alert(`Group with name "${groupName}" not found.`);
+                return;
+            }
+    
+            const groupId = groups[0]._id; // Assuming group names are unique and taking the first match
+    
+            // Ensure groupId is logged to check its format
+            console.log('Selected Group ID:', groupId);
+    
+            // Proceed to add the kid with the fetched group ID
+            const kidResponse = await fetch(`${BASE_URL}/kids`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, mother, group: groupId })
+            });
+    
+            if (kidResponse.ok) {
                 fetchKids();  // Refresh kids
                 kidForm.reset();
             } else {
-                alert('Failed to add kid');
+                const data = await kidResponse.json();
+                console.error('Failed to add kid:', data);
+                alert(`Failed to add kid: ${data.error}`);
             }
-        })
-        .catch(error => console.error('Error adding kid:', error));
+        } catch (error) {
+            console.error('Error fetching group or adding kid:', error);
+            alert('Error adding kid. Check console for more details.');
+        }
     });
+    
 
-    // Handle attendance submission
     attendanceForm?.addEventListener('submit', (e) => {
         e.preventDefault();
         const groupId = attendanceGroupSelect.value;
@@ -227,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             });
 
                             if (response.ok) {
-                                fetchKids();  // Refresh kids to update attendance count
+                                fetchKids();
                             } else {
                                 alert('Failed to update attendance');
                             }
@@ -245,23 +251,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (kid.attendanceCount >= 4) {
                             kid.attendanceCount -= 4;
                             countDisplay.textContent = ` الحضور: ${kid.attendanceCount} `;
-                            // Ideally, update the backend here as well
                         }
                     });
 
                     li.append(nameText, attendedButton, countDisplay, payButton);
                     attendanceList.appendChild(li);
                 });
+            })
+            .catch(error => {
+                console.error('Error fetching kids for attendance:', error);
+                alert('Error fetching kids. Check console for more details.');
             });
     });
 
-    // Handle parent view form submission
     parentViewForm?.addEventListener('submit', (e) => {
         e.preventDefault();
-        fetchKids().then(renderParentView); // Render parent view with fetched kids data
+        fetchKids().then(renderParentView);
     });
 
-    // Initial fetch and render
     fetchGroups();
     fetchKids();
 });
