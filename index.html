@@ -13,18 +13,27 @@
         <h1>مع مها</h1>
         <nav>
             <a href="index.html">الصفحة الرئيسية</a>
-            <a href="groups.html">إدارة المجموعات</a>
-            <a href="kids.html">إدارة الأطفال</a>
-            <a href="attendance.html">تتبع الحضور</a>
+            <a href="groups.html" class="protected">إدارة المجموعات</a>
+            <a href="kids.html" class="protected">إدارة الأطفال</a>
+            <a href="attendance.html" class="protected">تتبع الحضور</a>
             <a href="parent-view.html">عرض للآباء</a>
         </nav>
     </header>
+    
     <main>
-        <h2>مرحبًا بكم في متتبع حضور دروس الرسم</h2>
-        <p>هذا الموقع يساعدك على تتبع حضور دروس الرسم ويسمح للآباء بعرض حالة حضور أطفالهم.</p>
+        <h2>مرحبًا بكم في مع مها</h2>
+        <!-- Main content of the page can go here -->
     </main>
+
     <footer>
+        <form id="access-code-form">
+            <label for="access-code" style="color: black;">ادخل رمز الدخول:</label>
+            <input type="password" id="access-code" name="access-code" required>
+            <button type="submit">تبديل إلى وضع المعلم</button>
+        </form>
         <p>&copy; 2024 مع مها</p>
     </footer>
+
+    <script src="scripts.js"></script>
 </body>
 </html>
